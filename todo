@@ -1,0 +1,17 @@
+Authentication:
+User persistence   (done)
+
+wishlist:
+add to wishlist
+remove from wishlist
+
+Comparision:
+get both products by id and display
+show Comparision
+
+Product maintenance:
+admin registration
+edit Product
+
+Notification:
+Dynamic Notification (Logic ??) 

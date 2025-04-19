@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext'; 
 
@@ -6,6 +7,7 @@ export default function ProductCard({ product }) {
   const { user } = useContext(AuthContext);
   const { addItem } = useContext(WishlistContext); 
   const isAmazon = product.source === 'amazon';
+  const navigate = useNavigate(); // 👈 Add this line
 
   const handleAddToWishlist = async () => {
     if (!user) return alert('Please sign in to add to wishlist');
@@ -16,14 +18,21 @@ export default function ProductCard({ product }) {
         source: isAmazon ? 'amazon' : 'flipkart',
         price: product.price
       });
-     console.log(`Added product ${product.name} to wishlist`);  
+      console.log(`Added product ${product.name} to wishlist`);  
     } catch (error) {
       console.error('Error adding to wishlist:', error);
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/product/${product._id}`, { state: { product } });
+  };
+
   return (
-    <div className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition duration-300 overflow-hidden">
+    <div
+      className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition duration-300 overflow-hidden cursor-pointer"
+      onClick={handleCardClick} // 👈 Navigate to product detail
+    >
       <img
         src={product.image}
         alt={`Product image for ${product.title}`}
@@ -51,12 +60,16 @@ export default function ProductCard({ product }) {
           target="_blank"
           rel="noopener noreferrer"
           className="block text-sm text-sky-600 hover:underline"
+          onClick={(e) => e.stopPropagation()} // Prevent card click
         >
           View on {isAmazon ? 'Amazon' : 'Flipkart'}
         </a>
 
         <button
-          onClick={handleAddToWishlist}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click
+            handleAddToWishlist();
+          }}
           disabled={!user}
           className={`w-full py-2 rounded-lg text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 ${
             user

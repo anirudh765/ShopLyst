@@ -258,18 +258,18 @@ export default function Navbar() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                className="flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition"
               >
-                <span className="text-slate-800 dark:text-slate-200 text-lg">
+                <span className="text-slate-800 dark:text-white text-lg">
                   Hi, {user.name}
                 </span>
-                <FiChevronDown className="w-4 h-4 text-slate-600" />
+                <FiChevronDown className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-md z-10">
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-md z-10">
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
                   >
                     Logout
                   </button>
@@ -333,7 +333,7 @@ export default function Navbar() {
           {user ? (
             <>
               <span className="block text-slate-800 dark:text-slate-200 text-lg">
-                Hi, {console.log(user)}
+                Hi, {user.name}
               </span>
               <button
                 onClick={handleLogout}

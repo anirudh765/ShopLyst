@@ -1,29 +1,70 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext'; 
+import { deleteProduct } from '../services/productService';
 
 export default function ProductCard({ product }) {
   const { user } = useContext(AuthContext);
   const { addItem } = useContext(WishlistContext); 
   const isAmazon = product.source === 'amazon';
+  const navigate = useNavigate(); 
 
-  const handleAddToWishlist = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(product._id);
+        onDelete();
+        console.log("Product deleted");
+      } catch (err) {
+        console.error("Failed to delete product");
+      }
+    }
+  };
+  
+  const handleAddToWishlist = async (e) => {
+    e.stopPropagation();
     if (!user) return alert('Please sign in to add to wishlist');
-
+  
+    let targetPrice = null;
+    if (window.confirm('Would you like to set a target price for this product?')) {
+      const input = window.prompt('Enter your target price:');
+      if (input) {
+        targetPrice = parseFloat(input);
+        if (isNaN(targetPrice)) {
+          return alert('Invalid target price entered. Please try again.');
+        }
+      }
+    }
+  
     try {
       await addItem({
         _id: product._id,
         source: isAmazon ? 'amazon' : 'flipkart',
-        price: product.price
+        price: product.price,
+        targetPrice, 
       });
-     console.log(`Added product ${product.name} to wishlist`);  
+      console.log(`Added product ${product.name} to wishlist with target price: ${targetPrice || 'None'}`);
     } catch (error) {
       console.error('Error adding to wishlist:', error);
     }
   };
 
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    navigate(`/product/edit/${product._id}`, { state: { product } });
+  };
+
+  const handleCardClick = () => {
+    navigate(`/product/${product._id}`, { state: { product } });
+  };
+
   return (
-    <div className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition duration-300 overflow-hidden">
+    <div
+      className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition duration-300 overflow-hidden cursor-pointer"
+      onClick={handleCardClick} 
+    >
       <img
         src={product.image}
         alt={`Product image for ${product.title}`}
@@ -46,27 +87,57 @@ export default function ProductCard({ product }) {
           </div>
         </div>
 
-        <a
-          href={product.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-sm text-sky-600 hover:underline"
+        {/* {user && user.isadmin ? (
+        <button
+          onClick={handleEdit}
+          className="w-full py-2 mt-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
         >
-          View on {isAmazon ? 'Amazon' : 'Flipkart'}
-        </a>
-
+          Edit Product
+        </button>
+        
+      ) : (
         <button
           onClick={handleAddToWishlist}
           disabled={!user}
-          className={`w-full py-2 rounded-lg text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 ${
+          className={`w-full py-2 mt-2 text-white rounded-lg transition ${
             user
-              ? 'bg-sky-600 text-white hover:bg-sky-700'
+              ? 'bg-sky-600 hover:bg-sky-700'
               : 'bg-slate-200 text-slate-500 cursor-not-allowed'
           }`}
-          aria-disabled={!user}
         >
-          {user ? 'Add to Wishlist' : 'Sign in to Wishlist'}
+          Add to Wishlist
         </button>
+      )} */}
+
+      {
+        user && user.isadmin && <button
+        onClick={handleEdit}
+        className="w-full py-2 mt-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+      >
+        Edit Product
+      </button>
+      }
+      {
+        user && user.isadmin && <button
+        onClick={handleDelete}
+        className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+      >
+        Delete Product
+      </button>
+      }
+      {
+        user && !user.isadmin && <button
+        onClick={handleAddToWishlist}
+        className={`w-full py-2 mt-2 text-white rounded-lg transition ${
+          user
+            ? 'bg-sky-600 hover:bg-sky-700'
+            : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+        }`}
+      >
+        Add to Wishlist
+      </button>
+
+      }
       </div>
     </div>
   );

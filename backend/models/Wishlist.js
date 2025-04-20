@@ -8,8 +8,8 @@ const wishlistSchema = new mongoose.Schema({
   watched:          { type: Boolean, default: false },
   targetPrice:      { type: Number },
   price:            { type: Number },
-  dateAdded:        { type: Date, default: Date.now }
+  dateAdded:        { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.models.Wishlist ||
-  mongoose.model('Wishlist', wishlistSchema);
+mongoose.model('Wishlist', wishlistSchema);

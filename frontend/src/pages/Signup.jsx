@@ -11,6 +11,8 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false); // New state for admin checkbox
+  const [adminKey, setAdminKey] = useState(''); // New state for admin key
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,10 +22,16 @@ export default function Signup() {
       setError('Passwords do not match');
       return;
     }
+
+    if (isAdmin && !adminKey) {
+      setError('Admin key is required for admin registration');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
-      const userData = await authService.signup(name, email, password);
+      const userData = await authService.signup(name, email, password, isAdmin ? adminKey : null);
       login(userData);
       navigate('/');
     } catch (err) {
@@ -86,6 +94,29 @@ export default function Signup() {
                 className="p-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-700 text-zinc-800 dark:text-white"
               />
             </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isAdmin"
+                checked={isAdmin}
+                onChange={e => setIsAdmin(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="isAdmin" className="text-zinc-700 dark:text-zinc-200">Register as Admin</label>
+            </div>
+            {isAdmin && (
+              <div className="flex flex-col">
+                <label htmlFor="adminKey" className="font-semibold text-zinc-700 dark:text-zinc-200">Admin Key</label>
+                <input
+                  type="password"
+                  id="adminKey"
+                  value={adminKey}
+                  onChange={e => setAdminKey(e.target.value)}
+                  required
+                  className="p-2 border border-gray-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-700 text-zinc-800 dark:text-white"
+                />
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}

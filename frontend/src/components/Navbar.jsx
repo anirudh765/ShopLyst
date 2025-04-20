@@ -225,7 +225,7 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8 text-lg text-slate-700 dark:text-slate-300">
-          {user && (
+          {user && !user.isadmin &&  (
             <Link
               to="/wishlist"
               className="hover:text-sky-600 dark:hover:text-sky-400 transition"
@@ -234,42 +234,57 @@ export default function Navbar() {
             </Link>
           )}
 
-          <button
-            onClick={() => navigate('/alerts')}
-            className="relative hover:text-sky-600 dark:hover:text-sky-400 transition"
-            aria-label="View notifications"
-          >
-            <FiBell className="w-7 h-7" />
-            {notificationCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                {notificationCount}
-              </span>
-            )}
-          </button>
+          {
+            user && !user.isadmin && (
+              <button
+                onClick={() => navigate('/alerts')}
+                className="relative flex items-center gap-2 hover:text-sky-600 dark:hover:text-sky-400 transition"
+              >
+                <FiBell className="w-6 h-6" />
+                <span>Alerts</span>
+                {notificationCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
+              </button>
+            )
+          }
+
+          {
+            user && user.isadmin && (
+              <button
+                onClick={() => navigate('/product/add')}
+                className="hover:text-sky-600 dark:hover:text-sky-400 transition"
+              >
+                Add Product
+              </button>
+            )
+          }
 
           <button
             onClick={toggleTheme}
             className="hover:text-sky-600 dark:hover:text-sky-400 text-lg transition"
           >
-            {darkMode ? '☀️ Light' : '🌙 Dark'}
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
 
           {user ? (
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                className="flex items-center gap-1 px-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 transition"
               >
-                <span className="text-slate-800 dark:text-slate-200 text-lg">
+                <span className="text-slate-800 dark:text-white text-lg">
                   Hi, {user.name}
                 </span>
-                <FiChevronDown className="w-4 h-4 text-slate-600" />
+                <FiChevronDown className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-md z-10">
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-md z-10">
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700 transition"
                   >
                     Logout
                   </button>
@@ -327,13 +342,13 @@ export default function Navbar() {
             onClick={toggleTheme}
             className="w-full text-left hover:text-sky-600 dark:hover:text-sky-400 transition"
           >
-            {darkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'}
+            {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           </button>
 
           {user ? (
             <>
               <span className="block text-slate-800 dark:text-slate-200 text-lg">
-                Hi, {console.log(user)}
+                Hi, {user.name}
               </span>
               <button
                 onClick={handleLogout}

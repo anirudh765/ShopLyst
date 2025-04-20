@@ -78,16 +78,120 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// @route GET /api/products/:id
-router.get('/:id', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
+    if (!req.user.isadmin) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    console.log("Request in add",req.body);
+    const { source, ...productData } = req.body;
+
+    let product;
+    if (source === 'amazon') {
+      product = new AmazonProduct(productData);
+    } else if (source === 'flipkart') {
+      product = new FlipkartProduct(productData);
+    } else {
+      return res.status(400).json({ message: 'Invalid source' });
+    }
+
+    await product.save();
+    res.status(201).json(product);
+
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch product' });
+    console.error('Add product error:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+// @route GET /api/products/:id
+// GET /api/products/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // look in both collections
+    let product =
+      await AmazonProduct.findById(id).lean() ||
+      await FlipkartProduct.findById(id).lean();
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // attach a "source" field so the frontend knows which platform
+    product.source = (product.asin) ? 'amazon' : 'flipkart';
+    res.json(product);
+  } catch (err) {
+    console.error('GET /products/:id error', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+
+    const { id } = req.params;
+    const updates = req.body; // e.g. { title, price, rating, reviews, url, image }
+
+    // Try Amazon first
+    let updated = await AmazonProduct.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true
+    }).lean();
+
+    let source = 'amazon';
+
+    // If not found in Amazon, try Flipkart
+    if (!updated) {
+      updated = await FlipkartProduct.findByIdAndUpdate(id, updates, {
+        new: true,
+        runValidators: true
+      }).lean();
+      source = 'flipkart';
+    }
+
+    // If still not found, 404
+    if (!updated) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Attach source so frontend knows
+    updated.source = source;
+
+    return res.json(updated);
+  } catch (err) {
+    console.error('Error updating product:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Try deleting from Amazon collection
+    let deleted = await AmazonProduct.findByIdAndDelete(id);
+    if (deleted) {
+      return res.json({ message: 'Product deleted from Amazon' });
+    }
+
+    // Try deleting from Flipkart collection
+    deleted = await FlipkartProduct.findByIdAndDelete(id);
+    if (deleted) {
+      return res.json({ message: 'Product deleted from Flipkart' });
+    }
+
+    return res.status(404).json({ message: 'Product not found' });
+
+  } catch (err) {
+    console.error('Error deleting product:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 // @route GET /api/products/external/:source/:externalId
 router.get('/external/:source/:externalId', async (req, res) => {
@@ -103,13 +207,54 @@ router.get('/external/:source/:externalId', async (req, res) => {
 // @route GET /api/products/:id/compare
 router.get('/:id/compare', async (req, res) => {
   try {
-    // TODO: Compare prices across platforms using stored external IDs
-    res.json({
-      productId: req.params.id,
-      prices: [],
-    });
+    const { id } = req.params;
+
+    // 1️⃣ Try to find in Amazon
+    let amazon = await AmazonProduct.findById(id).lean();
+    let flipkart = null;
+
+    if (amazon) {
+      // 2️⃣ If found in Amazon, search Flipkart by title (case‑insensitive)
+      flipkart = await FlipkartProduct.findOne({
+        title: { $regex: new RegExp(amazon.title.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i') }
+      }).lean();
+    } else {
+      // 3️⃣ Otherwise, try the opposite
+      flipkart = await FlipkartProduct.findById(id).lean();
+      if (flipkart) {
+        amazon = await AmazonProduct.findOne({
+          title: { $regex: new RegExp(flipkart.title.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i') }
+        }).lean();
+      } else {
+        return res.status(404).json({ error: 'Product not found in either collection' });
+      }
+    }
+
+    // 4️⃣ Build the prices array
+    const prices = [];
+    if (amazon) {
+      prices.push({
+        source: 'amazon',
+        id:     amazon._id,
+        title:  amazon.title,
+        price:  amazon.price,
+        url:    amazon.url
+      });
+    }
+    if (flipkart) {
+      prices.push({
+        source: 'flipkart',
+        id:     flipkart._id,
+        title:  flipkart.title,
+        price:  flipkart.price,
+        url:    flipkart.url
+      });
+    }
+
+    return res.json({ productId: id, prices });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch price comparison' });
+    console.error('Compare error:', err);
+    return res.status(500).json({ error: 'Failed to fetch price comparison' });
   }
 });
 

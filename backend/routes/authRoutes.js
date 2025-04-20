@@ -15,10 +15,33 @@ const signToken = (userId) =>
 /**
  * @route POST /api/auth/signup
  */
+// router.post('/signup', async (req, res) => {
+//   try {
+//     const name     = req.body.user;
+//     const { email, password } = req.body;
+//     if (!name || !email || !password)
+//       return res.status(400).json({ message: 'Please fill all fields' });
+
+//     let user = await User.findOne({ email });
+//     if (user) return res.status(400).json({ message: 'Email already in use' });
+
+//     const hash = await bcrypt.hash(password, 10);
+//     user = await User.create({ name, email, password: hash });
+
+//     const token = signToken(user._id);
+//     res.status(201).json({
+//       user: { id: user._id, name: user.name, email: user.email },
+//       token
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
 router.post('/signup', async (req, res) => {
   try {
-    const name     = req.body.user;
-    const { email, password } = req.body;
+    const { name, email, password, adminKey } = req.body; // Include adminKey in the request body
     if (!name || !email || !password)
       return res.status(400).json({ message: 'Please fill all fields' });
 
@@ -26,12 +49,21 @@ router.post('/signup', async (req, res) => {
     if (user) return res.status(400).json({ message: 'Email already in use' });
 
     const hash = await bcrypt.hash(password, 10);
-    user = await User.create({ name, email, password: hash });
+    console.log("Admin Key:", adminKey); // Log the adminKey for debugging
+    // Check if the provided adminKey matches the environment variable
+    const isadmin = adminKey === process.env.ADMIN_KEY;
+
+    user = await User.create({
+      name,
+      email,
+      password: hash,
+      isadmin, // Set isAdmin based on the adminKey validation
+    });
 
     const token = signToken(user._id);
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email },
-      token
+      user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin },
+      token,
     });
   } catch (err) {
     console.error(err);

@@ -231,7 +231,7 @@ const AddProduct = () => {
               id="reviews"
               type="text"
               name="reviews"
-              placeholder="Reviews (e.g., '1,234')"
+              placeholder="Reviews (e.g. 1,2,3,4)"
               value={formData.reviews}
               onChange={handleChange}
               aria-label="Number of product reviews"

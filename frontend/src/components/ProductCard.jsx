@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext'; 
@@ -9,15 +9,19 @@ export default function ProductCard({ product, onDelete }) {
   const { addItem } = useContext(WishlistContext); 
   const isAmazon = product.source === 'amazon';
   const navigate = useNavigate();
+  // State for screen reader announcements
+  const [announcement, setAnnouncement] = useState('');
 
   const handleDelete = async (e) => {
     e.stopPropagation();
-    if (confirm("Are you sure you want to delete this product?")) {
+    if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await deleteProduct(product._id);
         onDelete();
+        setAnnouncement("Product successfully deleted");
         console.log("Product deleted");
       } catch (err) {
+        setAnnouncement("Failed to delete product");
         console.error("Failed to delete product");
       }
     }
@@ -25,7 +29,10 @@ export default function ProductCard({ product, onDelete }) {
   
   const handleAddToWishlist = async (e) => {
     e.stopPropagation();
-    if (!user) return alert('Please sign in to add to wishlist');
+    if (!user) {
+      setAnnouncement('Please sign in to add to wishlist');
+      return alert('Please sign in to add to wishlist');
+    }
   
     let targetPrice = null;
     if (window.confirm('Would you like to set a target price for this product?')) {
@@ -33,6 +40,7 @@ export default function ProductCard({ product, onDelete }) {
       if (input) {
         targetPrice = parseFloat(input);
         if (isNaN(targetPrice)) {
+          setAnnouncement('Invalid target price entered');
           return alert('Invalid target price entered. Please try again.');
         }
       }
@@ -45,8 +53,10 @@ export default function ProductCard({ product, onDelete }) {
         price: product.price,
         targetPrice, 
       });
+      setAnnouncement(`Added product ${product.title} to wishlist`);
       console.log(`Added product ${product.name} to wishlist with target price: ${targetPrice || 'None'}`);
     } catch (error) {
+      setAnnouncement('Error adding to wishlist');
       console.error('Error adding to wishlist:', error);
     }
   };
@@ -60,14 +70,36 @@ export default function ProductCard({ product, onDelete }) {
     navigate(`/product/${product._id}`, { state: { product } });
   };
 
+  // Handle keyboard navigation
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleCardClick();
+    }
+  };
+
   return (
     <div
-      className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition duration-300 overflow-hidden cursor-pointer"
+      className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:scale-105 transform transition duration-300 overflow-hidden cursor-pointer"
       onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      tabIndex="0"
+      role="article"
+      aria-label={`${product.title} product card`}
     >
+
+      {/* Screen reader announcement */}
+      <div 
+        aria-live="assertive" 
+        className="sr-only" 
+        role="status"
+      >
+        {announcement}
+      </div>
+      
       <img
         src={product.image}
-        alt={`Product image for ${product.title}`}
+        alt={`Product image: ${product.title}`}
         className="w-full h-64 object-contain p-4 bg-slate-50"
         loading="lazy"
       />
@@ -80,10 +112,12 @@ export default function ProductCard({ product, onDelete }) {
         <div className="text-sm space-y-1 text-slate-600">
           <div className="flex justify-between">
             <span className="font-medium">{isAmazon ? 'Amazon' : 'Flipkart'}</span>
-            <span className="text-emerald-600 font-semibold">₹{product.price}</span>
+            <span className="text-emerald-600 font-semibold" aria-label={`Price: ${product.price} Rupees`}>₹{product.price}</span>
           </div>
           <div className="text-xs text-slate-500">
-            ⭐ {product.rating} ({product.reviews})
+            <span aria-label={`Rated ${product.rating} out of 5 stars with ${product.reviews} reviews`}>
+              ⭐ {product.rating} ({product.reviews})
+            </span>
           </div>
         </div>
 
@@ -91,13 +125,17 @@ export default function ProductCard({ product, onDelete }) {
           <>
             <button
               onClick={handleEdit}
+              onKeyDown={(e) => e.stopPropagation()}
               className="w-full py-2 mt-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+              aria-label={`Edit product: ${product.title}`}
             >
               Edit Product
             </button>
             <button
               onClick={handleDelete}
+              onKeyDown={(e) => e.stopPropagation()}
               className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              aria-label={`Delete product: ${product.title}`}
             >
               Delete Product
             </button>
@@ -107,7 +145,9 @@ export default function ProductCard({ product, onDelete }) {
         {user && !user.isadmin && (
           <button
             onClick={handleAddToWishlist}
+            onKeyDown={(e) => e.stopPropagation()}
             className="w-full py-2 mt-2 text-white rounded-lg transition bg-sky-600 hover:bg-sky-700"
+            aria-label={`Add ${product.title} to wishlist`}
           >
             Add to Wishlist
           </button>
@@ -117,6 +157,7 @@ export default function ProductCard({ product, onDelete }) {
           <button
             disabled
             className="w-full py-2 mt-2 bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed"
+            aria-label="Sign in to add to wishlist"
           >
             Sign in to Add to Wishlist
           </button>

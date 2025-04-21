@@ -1,15 +1,15 @@
-// src/pages/ProductDetail.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import PriceComparisonTable from '../components/PriceComparisonTable';
 import { AuthContext } from '../context/AuthContext';
 import productService from '../services/productService';
-import wishlistService from '../services/wishlistService';
+import { WishlistContext } from '../context/WishlistContext';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const location = useLocation();
   const { user } = useContext(AuthContext);
+  const { addItem } = useContext(WishlistContext);
 
   const passedProduct = location.state?.product || null;
 
@@ -52,11 +52,24 @@ export default function ProductDetail() {
     setWishLoading(true);
     setWishError('');
     setWishSuccess('');
+
+    let targetPrice = null;
+    if (window.confirm('Would you like to set a target price for this product?')) {
+      const input = window.prompt('Enter your target price:');
+      if (input) {
+        targetPrice = parseFloat(input);
+        if (isNaN(targetPrice)) {
+          return alert('Invalid target price entered. Please try again.');
+        }
+      }
+    }
+
     try {
-      await wishlistService.addToWishlist({
-        productId: product._id || product.id,
-        watched: false,
-        targetPrice: null
+      await addItem({
+        _id: product._id || product.id,
+        source: product.source,
+        price: product.price,
+        targetPrice
       });
       setWishSuccess('Added to wishlist!');
     } catch (err) {
@@ -96,18 +109,28 @@ export default function ProductDetail() {
             className="w-full md:w-1/3 object-contain rounded-lg bg-white p-4"
           />
           <div className="flex-1 space-y-4">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{product.title}</h1>
+            <p className="text-gray-700 dark:text-gray-300">
+              {product.source === "amazon" ? "Amazon" : "Flipkart"}
+            </p>
             {product.description && (
               <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
             )}
-
-            <button
-              onClick={handleAddToWishlist}
-              disabled={wishLoading}
-              className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50 transition-colors"
-            >
-              {wishLoading ? 'Adding...' : 'Add to Wishlist'}
-            </button>
+            {product.price && (
+              <p className="text-gray-700 dark:text-gray-300">₹{product.price}</p>
+            )}
+            <p className="text-gray-700 dark:text-gray-300">Rating: {product.rating}</p>
+            <p className="text-gray-700 dark:text-gray-300">Reviews: {product.reviews}</p>
+            
+            {!user?.isadmin && (
+              <button
+                onClick={handleAddToWishlist}
+                disabled={wishLoading}
+                className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              >
+                {wishLoading ? 'Adding...' : 'Add to Wishlist'}
+              </button>
+            )}
             {wishError && (
               <p className="text-red-500 dark:text-red-400 text-sm">{wishError}</p>
             )}

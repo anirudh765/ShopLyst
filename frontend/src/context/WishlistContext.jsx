@@ -35,13 +35,13 @@ export default function WishlistProvider({ children }) {
   }, [user]);
 
   // product: { _id, source }
-  const addItem = async ({ _id, source,price }) => {
+  const addItem = async ({ _id, source,price,targetPrice }) => {
     await addToWishlist({
       productId: _id,
       source,
       price,
       watched: false,
-      targetPrice: null
+      targetPrice
     });
     fetchWishlist();
   };

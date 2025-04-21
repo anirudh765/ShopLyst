@@ -7,7 +7,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Wishlist from './pages/Wishlist';
 import ProductDetail from './pages/ProductDetail';
-import Alerts from './pages/Alerts';  // Import Alerts Page
+import EditProduct    from './pages/EditProduct';
+import AddProduct from './pages/AddProduct';
+import Alerts from './pages/Alerts'; 
 
 import AuthProvider from './context/AuthContext';
 import WishlistProvider from './context/WishlistContext';
@@ -26,7 +28,9 @@ export default function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/alerts" element={<Alerts />} /> {/* Add Alerts route */}
+              <Route path="/product/edit/:id" element={<EditProduct />} />
+              <Route path="/product/add" element={<AddProduct />} />
+              <Route path="/alerts" element={<Alerts />} />
             </Routes>
           </WishlistProvider>
         </AuthProvider>

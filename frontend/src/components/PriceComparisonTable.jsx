@@ -19,7 +19,7 @@ export default function PriceComparisonTable({ product }) {
           <span className="text-slate-800 dark:text-slate-200">Amazon</span>
         </div>
         <div className="px-4 py-3 text-emerald-600 font-semibold">
-          {product.amazonPrice ? `$${product.amazonPrice}` : '—'}
+          ₹{product.amazonPrice ? `${product.amazonPrice}` : '—'}
         </div>
         <div className="px-4 py-3 hidden sm:block">
           {product.amazonUrl ? (
@@ -44,7 +44,7 @@ export default function PriceComparisonTable({ product }) {
           <span className="text-slate-800 dark:text-slate-200">Flipkart</span>
         </div>
         <div className="px-4 py-3 text-emerald-600 font-semibold">
-          {product.flipkartPrice ? `$${product.flipkartPrice}` : '—'}
+          {product.flipkartPrice ? `₹${product.flipkartPrice}` : '—'}
         </div>
         <div className="px-4 py-3 hidden sm:block">
           {product.flipkartUrl ? (

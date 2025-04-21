@@ -15,8 +15,35 @@ const compareProductPrices = async (id) => {
   return res.data;
 };
 
+export const updateProduct = async (id, data) => {
+  const res = await api.put(`/products/${id}`, data);
+  return res.data;
+};
+
+export const deleteProduct = async (id) => {
+  try {
+    const res = await api.delete(`products/${id}`);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data?.message || err.message;
+  }
+};
+
+export const addProduct = async (productData) => {
+  try {
+    console.log("Request in productservice: ", productData);
+    const res = await api.post(`/products`, productData);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data?.message || err.message;
+  }
+};
+
 export default {
   searchProducts,
   getProductById,
-  compareProductPrices
+  compareProductPrices,
+  updateProduct,
+  deleteProduct,
+  addProduct
 };

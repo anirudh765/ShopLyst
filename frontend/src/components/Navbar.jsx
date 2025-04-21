@@ -225,7 +225,7 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8 text-lg text-slate-700 dark:text-slate-300">
-          {user && (
+          {user && !user.isadmin &&  (
             <Link
               to="/wishlist"
               className="hover:text-sky-600 dark:hover:text-sky-400 transition"
@@ -234,24 +234,39 @@ export default function Navbar() {
             </Link>
           )}
 
-          <button
-            onClick={() => navigate('/alerts')}
-            className="relative hover:text-sky-600 dark:hover:text-sky-400 transition"
-            aria-label="View notifications"
-          >
-            <FiBell className="w-7 h-7" />
-            {notificationCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                {notificationCount}
-              </span>
-            )}
-          </button>
+          {
+            user && !user.isadmin && (
+              <button
+                onClick={() => navigate('/alerts')}
+                className="relative flex items-center gap-2 hover:text-sky-600 dark:hover:text-sky-400 transition"
+              >
+                <FiBell className="w-6 h-6" />
+                <span>Alerts</span>
+                {notificationCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notificationCount}
+                  </span>
+                )}
+              </button>
+            )
+          }
+
+          {
+            user && user.isadmin && (
+              <button
+                onClick={() => navigate('/product/add')}
+                className="hover:text-sky-600 dark:hover:text-sky-400 transition"
+              >
+                Add Product
+              </button>
+            )
+          }
 
           <button
             onClick={toggleTheme}
             className="hover:text-sky-600 dark:hover:text-sky-400 text-lg transition"
           >
-            {darkMode ? '☀️ Light' : '🌙 Dark'}
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
 
           {user ? (
@@ -327,7 +342,7 @@ export default function Navbar() {
             onClick={toggleTheme}
             className="w-full text-left hover:text-sky-600 dark:hover:text-sky-400 transition"
           >
-            {darkMode ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'}
+            {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           </button>
 
           {user ? (

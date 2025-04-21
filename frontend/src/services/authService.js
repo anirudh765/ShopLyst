@@ -6,8 +6,14 @@ export const login = async (email, password) => {
   return res.data; // { user, token }
 };
 
-export const signup = async (user, email, password) => {
-  const res = await api.post('/auth/signup', { user, email, password });
+export const signup = async (name, email, password, adminKey = null) => {
+  const res = await api.post('/auth/signup', {
+    name,
+    email,
+    password,
+    isAdmin: !!adminKey, // Set isAdmin to true if adminKey is provided
+    adminKey, // Include adminKey if provided
+  });
   return res.data; // { user, token }
 };
 

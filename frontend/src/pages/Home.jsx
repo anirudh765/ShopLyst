@@ -8,10 +8,11 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [productDeleted, setProductDeleted] = useState(false);
 
   useEffect(() => {
     fetchProducts('');
-  }, []);
+  }, [productDeleted]);
 
   const fetchProducts = async (q) => {
     setLoading(true);
@@ -30,6 +31,10 @@ export default function Home() {
     e.preventDefault();
     if (!query.trim()) return;
     fetchProducts(query.trim());
+  };
+
+  const handleProductDeleted = () => {
+    setProductDeleted(prev => !prev);
   };
 
   return (
@@ -83,7 +88,7 @@ export default function Home() {
                 className="opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
               >
-                <ProductCard product={product} />
+                <ProductCard product={product} onDelete={handleProductDeleted}/>
               </div>
             ))}
           </div>

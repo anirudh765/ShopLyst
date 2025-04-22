@@ -6,7 +6,7 @@ add to wishlist
 remove from wishlist
 
 Comparision:
-get both products by id and display
+get both products by title and display
 show Comparision
 
 Product maintenance:
@@ -14,4 +14,7 @@ admin registration
 edit Product
 
 Notification:
-Dynamic Notification (Logic ??) 
+alerts Notification
+
+** product categories
+** different products comparision - suggest within same product

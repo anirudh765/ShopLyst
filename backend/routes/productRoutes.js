@@ -78,13 +78,21 @@ router.get('/search', async (req, res) => {
   }
 });
 
+// routes/productRoutes.js
 router.post('/', authMiddleware, async (req, res) => {
   try {
     if (!req.user.isadmin) {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    console.log("Request in add",req.body);
-    const { source, ...productData } = req.body;
+
+    // support either req.body.source or req.body.platform
+    const source = (req.body.source || req.body.platform || '').toLowerCase();
+    const productData = { ...req.body };
+    delete productData.source;
+    delete productData.platform;
+
+    console.log("Source in add:", source);
+    console.log("Payload in add:", productData);
 
     let product;
     if (source === 'amazon') {
@@ -103,6 +111,7 @@ router.post('/', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 // @route GET /api/products/:id

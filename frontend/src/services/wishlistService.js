@@ -14,6 +14,7 @@ export const addToWishlist = async ({ productId, source,price, watched, targetPr
     watched,
     targetPrice
   });
+  console.log(res.data.error);
   return res.data;
 };
 

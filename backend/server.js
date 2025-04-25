@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const alertRoutes = require('./routes/alerts');
 
 // Initialize express app
 const app = express();
@@ -28,7 +29,7 @@ const io = new Server(server, {
 });
 
 // Initialize socket connection
-require('./utils/socket')(io);
+//require('./utils/socket')(io);
 
 // Middleware
 app.use(cors({
@@ -40,16 +41,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Make io accessible to our routes
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
+// app.use((req, res, next) => {
+//   req.io = io;
+//   next();
+// });
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/alerts', notificationRoutes);
+//app.use('/api/alerts', notificationRoutes);
+app.use('/api/alerts', alertRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -68,7 +70,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Start the price checking scheduler
-scheduler.initScheduler();
+// scheduler.initScheduler();
 
 // Start server
 const PORT = process.env.PORT || 5000;

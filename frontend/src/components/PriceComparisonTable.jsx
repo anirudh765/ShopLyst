@@ -46,7 +46,7 @@ export default function PriceComparisonTable({ product }) {
             role="row"
           >
             <div className="px-4 py-3 flex items-center gap-2" role="cell">
-              <img src="/amazon.png" alt="" className="w-5 h-5" />
+              {/* <img src="/amazon.png" alt="" className="w-5 h-5" /> */}
               <span className="text-slate-800 dark:text-slate-200">Amazon</span>
             </div>
             <div 
@@ -80,7 +80,7 @@ export default function PriceComparisonTable({ product }) {
             role="row"
           >
             <div className="px-4 py-3 flex items-center gap-2" role="cell">
-              <img src="/flipkart.png" alt="" className="w-5 h-5" />
+              {/* <img src="/flipkart.png" alt="" className="w-5 h-5" /> */}
               <span className="text-slate-800 dark:text-slate-200">Flipkart</span>
             </div>
             <div 

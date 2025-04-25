@@ -67,13 +67,13 @@ export default function Home() {
   return (
     <div className="pt-20 px-4 min-h-screen bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black transition-colors duration-300">
       {/* Screen reader announcement */}
-      <div 
+      {/* <div 
         aria-live="assertive" 
         className="sr-only" 
         role="status"
       >
         {announcement}
-      </div>
+      </div> */}
 
       {/* Hero Section */}
       <div className="max-w-2xl mx-auto text-center py-12">
@@ -108,7 +108,7 @@ export default function Home() {
       <div 
         className="max-w-6xl mx-auto py-10" 
         ref={searchResultsRef} 
-        tabIndex="-1" 
+        // tabIndex="-1" 
         aria-label="Search Results" 
         role="region"
       >

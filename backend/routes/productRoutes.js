@@ -22,61 +22,69 @@ const fetchExternalProductDetails = async (source, externalId) => {
  * @query   {number} page  - page number (default: 1)
  * @query   {number} limit - items per page (default: 20)
  */
+// routes/productRoutes.js (or wherever your search lives)
 router.get('/search', async (req, res) => {
-  const { q = '', page = 1, limit = 20 } = req.query;
+  const {
+    q = '',
+    category = '',   // ← new
+    page = 1,
+    limit = 20
+  } = req.query;
 
   try {
-    // Build a case‑insensitive regex from the query
+    // Build basic title‐regex
     const regex = new RegExp(q, 'i');
+
+    // Base filter: always match title; add category if set
+    const filter = { title: regex };
+    if (category) filter.category = category;
 
     // Query both collections in parallel
     const [amazonDocs, flipkartDocs] = await Promise.all([
-      AmazonProduct.find({ title: regex }).lean(),
-      FlipkartProduct.find({ title: regex }).lean()
+      AmazonProduct.find(filter).lean(),
+      FlipkartProduct.find(filter).lean()
     ]);
 
-    // Normalize to a single array with a `source` flag
+    // Normalize + include your new fields
     const unified = [
       ...amazonDocs.map(doc => ({
-        _id:    doc._id,
-        source: 'amazon',
-        title:  doc.title,
-        price:  doc.price,
-        rating: doc.rating,
-        reviews:doc.reviews,
-        image:  doc.image,
-        url:    doc.url
+        _id:      doc._id,
+        source:   'amazon',
+        title:    doc.title,
+        price:    doc.price,
+        rating:   doc.rating,
+        reviews:  doc.reviews,
+        image:    doc.image,
+        url:      doc.url,
+        category: doc.category,   // ← include category
+        features: doc.features    // ← include features
       })),
       ...flipkartDocs.map(doc => ({
-        _id:    doc._id,
-        source: 'flipkart',
-        title:  doc.title,
-        price:  doc.price,
-        rating: doc.rating,
-        reviews:doc.reviews,
-        image:  doc.image,
-        url:    doc.url
+        _id:      doc._id,
+        source:   'flipkart',
+        title:    doc.title,
+        price:    doc.price,
+        rating:   doc.rating,
+        reviews:  doc.reviews,
+        image:    doc.image,
+        url:      doc.url,
+        category: doc.category,
+        features: doc.features
       }))
     ];
 
-    // Total count before pagination
-    const total = unified.length;
-
-    // Simple in‑memory pagination
-    const start = (page - 1) * limit;
+    // pagination
+    const total   = unified.length;
+    const start   = (page - 1) * limit;
     const results = unified.slice(start, start + +limit);
 
-    res.json({
-      results,
-      total,
-      page:  +page,
-      limit: +limit
-    });
+    res.json({ results, total, page: +page, limit: +limit });
   } catch (err) {
     console.error('Search error:', err);
     res.status(500).json({ error: 'Failed to search products' });
   }
 });
+
 
 // routes/productRoutes.js
 router.post('/', authMiddleware, async (req, res) => {
@@ -111,8 +119,6 @@ router.post('/', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 
 // @route GET /api/products/:id
 // GET /api/products/:id
@@ -200,7 +206,56 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// routes/productRoutes.js
+router.get('/:id/suggestions', async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    // 1) Load the current product
+    const current =
+      await AmazonProduct.findById(id).lean() ||
+      await FlipkartProduct.findById(id).lean();
+    if (!current) return res.status(404).json({ error: 'Product not found' });
+
+    const currentKey = current.title.trim().toLowerCase();
+    const { category } = current;
+
+    // 2) Fetch same-category items from both collections
+    const [amazonDocs, flipkartDocs] = await Promise.all([
+      AmazonProduct.find({ category }).lean(),
+      FlipkartProduct.find({ category }).lean()
+    ]);
+
+    // 3) Merge + dedupe by title + skip same-title + skip same-id
+    const seen = new Set();
+    const suggestions = [];
+
+    const addIfNew = (doc, source) => {
+      const key = doc.title.trim().toLowerCase();
+      // skip if same as current title or same ID
+      if (key === currentKey || doc._id.toString() === id) return;
+      if (!seen.has(key)) {
+        seen.add(key);
+        suggestions.push({
+          _id:    doc._id,
+          source,
+          title:  doc.title,
+          price:  doc.price,
+          image:  doc.image,
+          url:    doc.url
+        });
+      }
+    };
+
+    amazonDocs.forEach(doc => addIfNew(doc, 'amazon'));
+    flipkartDocs.forEach(doc => addIfNew(doc, 'flipkart'));
+
+    res.json(suggestions);
+  } catch (err) {
+    console.error('GET /products/:id/suggestions error', err);
+    res.status(500).json({ error: 'Server error fetching suggestions' });
+  }
+});
 
 // @route GET /api/products/external/:source/:externalId
 router.get('/external/:source/:externalId', async (req, res) => {

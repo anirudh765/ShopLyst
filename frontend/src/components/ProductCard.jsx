@@ -78,94 +78,6 @@ export default function ProductCard({ product, onDelete }) {
     }
   };
 
-//   return (
-//     <div
-//       className="border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md hover:scale-105 transform transition duration-300 overflow-hidden cursor-pointer"
-//       onClick={handleCardClick}
-//       onKeyDown={handleKeyDown}
-//       tabIndex="0"
-//       role="article"
-//       aria-label={`${product.title} product card`}
-//     >
-
-//       {/* Screen reader announcement */}
-//       <div 
-//         aria-live="assertive" 
-//         className="sr-only" 
-//         role="status"
-//       >
-//         {announcement}
-//       </div>
-      
-//       <img
-//         src={product.image}
-//         alt={`Product image: ${product.title}`}
-//         className="w-full h-64 object-contain p-4 bg-slate-50"
-//         loading="lazy"
-//       />
-
-//       <div className="p-4 space-y-4">
-//         <h3 className="text-base font-semibold text-slate-800 leading-snug line-clamp-2">
-//           {product.title}
-//         </h3>
-
-//         <div className="text-sm space-y-1 text-slate-600">
-//           <div className="flex justify-between">
-//             <span className="font-medium">{isAmazon ? 'Amazon' : 'Flipkart'}</span>
-//             <span className="text-emerald-600 font-semibold" aria-label={`Price: ${product.price} Rupees`}>₹{product.price}</span>
-//           </div>
-//           <div className="text-xs text-slate-500">
-//             <span aria-label={`Rated ${product.rating} out of 5 stars with ${product.reviews} reviews`}>
-//               ⭐ {product.rating} ({product.reviews})
-//             </span>
-//           </div>
-//         </div>
-
-//         {user && user.isadmin && (
-//           <>
-//             <button
-//               onClick={handleEdit}
-//               onKeyDown={(e) => e.stopPropagation()}
-//               className="w-full py-2 mt-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
-//               aria-label={`Edit product: ${product.title}`}
-//             >
-//               Edit Product
-//             </button>
-//             <button
-//               onClick={handleDelete}
-//               onKeyDown={(e) => e.stopPropagation()}
-//               className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-//               aria-label={`Delete product: ${product.title}`}
-//             >
-//               Delete Product
-//             </button>
-//           </>
-//         )}
-
-//         {user && !user.isadmin && (
-//           <button
-//             onClick={handleAddToWishlist}
-//             onKeyDown={(e) => e.stopPropagation()}
-//             className="w-full py-2 mt-2 text-white rounded-lg transition bg-sky-600 hover:bg-sky-700"
-//             aria-label={`Add ${product.title} to wishlist`}
-//           >
-//             Add to Wishlist
-//           </button>
-//         )}
-
-//         {!user && (
-//           <button
-//             disabled
-//             className="w-full py-2 mt-2 bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed"
-//             aria-label="Sign in to add to wishlist"
-//           >
-//             Sign in to Add to Wishlist
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
 return (
   <div
     className="border border-slate-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md hover:scale-105 transform transition duration-300 overflow-hidden cursor-pointer"
@@ -213,7 +125,7 @@ return (
           <button
             onClick={handleEdit}
             onKeyDown={(e) => e.stopPropagation()}
-            className="w-full py-2 mt-2 bg-yellow-500 dark:bg-yellow-600 text-white rounded-lg hover:bg-yellow-600 dark:hover:bg-yellow-700 transition-colors"
+            className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
             aria-label={`Edit product: ${product.title}`}
           >
             Edit Product

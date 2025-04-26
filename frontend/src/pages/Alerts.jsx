@@ -1,58 +1,3 @@
-// import React, { useEffect, useState, useContext } from 'react';
-// import { AuthContext } from '../context/AuthContext';
-// import { getAlerts, deleteAlert } from '../services/notificationService';
-// import AlertItem from '../components/AlertItem';
-
-// export default function Alerts() {
-//   const { user } = useContext(AuthContext);
-//   const [alerts, setAlerts] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState('');
-
-//   // Fetch only price‑drop alerts (backend already filters by currentPrice <= targetPrice
-//   // and excludes any deletedProductIds)
-//   useEffect(() => {
-//     if (!user) return;
-//     setLoading(true);
-//     getAlerts()
-//       .then(setAlerts)
-//       .catch((err) => setError(err))
-//       .finally(() => setLoading(false));
-//   }, [user]);
-
-//   // Delete = tell backend to record this productId as “ignored”
-//   const handleDelete = async (productId) => {
-//     if (!window.confirm('Delete this alert?')) return;
-//     try {
-//       await deleteAlert(productId);
-//       setAlerts((prev) => prev.filter((a) => a.productId !== productId));
-//     } catch (err) {
-//       console.error('Unable to delete alert:', err);
-//     }
-//   };
-
-//   if (!user)   return <p className="p-4">Please log in to view alerts.</p>;
-//   if (loading) return <p className="p-4">Loading alerts…</p>;
-//   if (error)   return <p className="p-4 text-red-500">{error}</p>;
-
-//   return (
-//     <div className="pt-24 px-4 max-w-2xl mx-auto">
-//       <h1 className="text-2xl font-bold mb-6">Your Price‑Drop Alerts</h1>
-//       {alerts.length === 0 ? (
-//         <p>No price‑drop alerts at the moment.</p>
-//       ) : (
-//         alerts.map((alert) => (
-//           <AlertItem
-//             key={alert.productId}
-//             alert={alert}
-//             onDelete={handleDelete}
-//           />
-//         ))
-//       )}
-//     </div>
-//   );
-// }
-
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { getAlerts, deleteAlert } from '../services/notificationService';
@@ -88,22 +33,6 @@ export default function Alerts() {
   if (loading) return <p className="p-4 text-gray-700 dark:text-gray-200">Loading alerts…</p>;
   if (error) return <p className="p-4 text-red-500 dark:text-red-400">{error}</p>;
 
-  // return (
-  //   <div className="pt-24 px-4 max-w-2xl mx-auto min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-  //     <h1 className="text-2xl font-bold mb-6 dark:text-gray-200">Your Price‑Drop Alerts</h1>
-  //     {alerts.length === 0 ? (
-  //       <p className="text-gray-600 dark:text-gray-400">No price‑drop alerts at the moment.</p>
-  //     ) : (
-  //       alerts.map((alert) => (
-  //         <AlertItem
-  //           key={alert.productId}
-  //           alert={alert}
-  //           onDelete={handleDelete}
-  //         />
-  //       ))
-  //     )}
-  //   </div>
-  // );
   return (
     <div className="pt-24 px-4 max-w-2xl mx-auto min-h-screen bg-gray-100 dark:bg-zinc-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <h1 className="text-2xl font-bold mb-6 dark:text-gray-200 transition-colors">

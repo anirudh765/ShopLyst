@@ -22,7 +22,9 @@ export default function AlertItem({ alert, onDelete }) {
         </p>
       </div>
       <button
-        onClick={() => onDelete(productId)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(productId)}}
         className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors"
         title="Delete this alert"
         aria-label={`Delete ${title} alert`}>

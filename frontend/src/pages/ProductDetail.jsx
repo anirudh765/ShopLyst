@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import productService from '../services/productService';
 import { WishlistContext } from '../context/WishlistContext';
 import Suggestion from '../components/Suggestion';
+import { toast } from 'react-toastify' ;
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -92,12 +93,18 @@ export default function ProductDetail() {
         price: product.price,
         targetPrice
       });
+      toast.info('Product added to your wishlist successfully!');
       setWishSuccess('Added to wishlist!');
       setAnnouncement('Product successfully added to wishlist');
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to add';
-      setWishError(errorMessage);
-      setAnnouncement(`Error: ${errorMessage}`);
+    } catch (error) {
+      console.error('Error adding to wishlist:', error);
+  
+      if (error.response && error.response.status === 400) {
+        toast.info('Product already exists in your wishlist');
+      } else {
+        toast.error('Error adding to wishlist. Please try again.');
+      }
+      setAnnouncement('Error adding to wishlist');
     } finally {
       setWishLoading(false);
     }

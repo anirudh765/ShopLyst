@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { getAlerts, deleteAlert } from '../services/notificationService';
 import AlertItem from '../components/AlertItem';
 import { FiBell } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 
 export default function Alerts() {
   const { user } = useContext(AuthContext);
@@ -26,6 +27,7 @@ export default function Alerts() {
     } catch (err) {
       console.error('Unable to delete alert:', err);
     }
+    toast.info('Alert deleted successfully!');
     setAlerts((prev) => prev.filter((a) => a.productId !== productId));
   };
 

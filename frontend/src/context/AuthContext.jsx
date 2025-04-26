@@ -21,9 +21,20 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = ({ user, token }) => {
-    setUser(user);
+  // const login = ({ user, token }) => {
+  //   setUser(user);
+  //   localStorage.setItem('token', token);
+  // };
+
+  const login = async ({ token }) => {
     localStorage.setItem('token', token);
+    try {
+      const freshUser = await getUser();
+      setUser(freshUser);
+    } catch (error) {
+      console.error('Failed to fetch user after login', error);
+      localStorage.removeItem('token');
+    }
   };
 
   const logout = () => {
@@ -32,7 +43,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user,setUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

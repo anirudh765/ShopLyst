@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import WishlistItem from '../components/WishlistItem';
 import wishlistService from '../services/wishlistService';
 import { AuthContext } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 export default function Wishlist() {
   const { user } = useContext(AuthContext);
@@ -38,8 +39,10 @@ export default function Wishlist() {
 
   const handleRemove = async (id) => {
     try {
+      if (!window.confirm('Are you sure you want to remove this item from your wishlist?')) return;
       await wishlistService.removeFromWishlist(id);
       const removedItem = items.find(item => item._id === id);
+      toast.info(`Removed ${removedItem?.title || 'item'} from wishlist`);
       setItems((prev) => prev.filter((item) => item._id !== id));
       setAnnouncement(`${removedItem?.title || 'Item'} removed from wishlist`);
     } catch (err) {

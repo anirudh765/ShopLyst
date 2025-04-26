@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { WishlistContext } from '../context/WishlistContext'; 
 import { deleteProduct } from '../services/productService';
+import { toast } from 'react-toastify' ;
 
 export default function ProductCard({ product, onDelete }) {
   const { user } = useContext(AuthContext);
@@ -53,12 +54,20 @@ export default function ProductCard({ product, onDelete }) {
         price: product.price,
         targetPrice, 
       });
+      toast.info('Product added to your wishlist succesfully!');
       setAnnouncement(`Added product ${product.title} to wishlist`);
       console.log(`Added product ${product.name} to wishlist with target price: ${targetPrice || 'None'}`);
     } catch (error) {
-      setAnnouncement('Error adding to wishlist');
       console.error('Error adding to wishlist:', error);
+  
+      if (error.response && error.response.status === 400) {
+        toast.info('Product already exists in your wishlist');
+      } else {
+        toast.error('Error adding to wishlist. Please try again.');
+      }
+      setAnnouncement('Error adding to wishlist');
     }
+    
   };
 
   const handleEdit = (e) => {

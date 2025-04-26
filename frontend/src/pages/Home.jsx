@@ -33,7 +33,7 @@ export default function Home() {
     setLoading(true)
     setError(null)
     try {
-      const { results } = await productService.searchProducts(q, 1, 20, cat)
+      const { results } = await productService.searchProducts(q, 1, 60, cat)
       setProducts(results)
 
       if (cat) {

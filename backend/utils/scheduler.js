@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const mongoose = require('mongoose');
 const Wishlist = require('../models/Wishlist');
 const Product = require('../models/Product');
+const Alert = require('../models/Alert');
 
 /**
  * Scheduler for checking price updates

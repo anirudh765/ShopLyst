@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import productService from '../services/productService';
+import { FiExternalLink } from 'react-icons/fi' ;
 
 export default function Compare() {
   const location = useLocation();
@@ -34,7 +35,7 @@ export default function Compare() {
   }, [leftId, rightId]);
 
   if (loading) return <p className="pt-20 text-center">Loading comparison...</p>;
-  if (error)   return <p className="pt-20 text-center text-red-500">{error}</p>;
+  if (error) return <p className="pt-20 text-center text-red-500">{error}</p>;
   if (!leftProd || !rightProd) return <p className="pt-20 text-center">Invalid products to compare.</p>;
 
   const keys = Array.from(new Set([
@@ -64,7 +65,14 @@ export default function Compare() {
                 <tr>
                   <th className="p-4 border-b"></th>
                   <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{leftProd.title}</th>
-                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{rightProd.title}</th>
+                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{rightProd.title}
+                    <button
+                      onClick={() => navigate(`/product/${rightId}`)}
+                      className="text-blue-600 hover:underline font-semibold"
+                    >
+                      <FiExternalLink className="inline-block ml-1" size={16} />
+                    </button>
+                  </th>
                 </tr>
               </thead>
               <tbody>

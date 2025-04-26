@@ -12,32 +12,7 @@ const signToken = (userId) =>
     expiresIn: '55m',
   });
 
-/**
- * @route POST /api/auth/signup
- */
-// router.post('/signup', async (req, res) => {
-//   try {
-//     const name     = req.body.user;
-//     const { email, password } = req.body;
-//     if (!name || !email || !password)
-//       return res.status(400).json({ message: 'Please fill all fields' });
 
-//     let user = await User.findOne({ email });
-//     if (user) return res.status(400).json({ message: 'Email already in use' });
-
-//     const hash = await bcrypt.hash(password, 10);
-//     user = await User.create({ name, email, password: hash });
-
-//     const token = signToken(user._id);
-//     res.status(201).json({
-//       user: { id: user._id, name: user.name, email: user.email },
-//       token
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
 
 router.post('/signup', async (req, res) => {
   try {

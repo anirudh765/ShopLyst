@@ -7,7 +7,12 @@ const flipkartProductSchema = new mongoose.Schema({
   rating:  { type: Number },
   reviews: { type: String },
   image:   { type: String },
-  url:     { type: String }
+  url:     { type: String },
+  category: {
+        type: String,
+        required: true,
+      },
+      features: mongoose.Schema.Types.Mixed
 }, { timestamps: true ,collection: 'flipkart'});
 
 module.exports = mongoose.models.FlipkartProduct ||

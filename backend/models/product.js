@@ -4,21 +4,13 @@ const comparisonSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    unique: true, // So we don’t store multiple comparison entries for same product
+    unique: true,
   },
   category: {
     type: String,
     required: true,
   },
-  features: {
-    type: Map,
-    of: String, // or `Mixed` if some values are numbers or nested structures
-    required: true,
-  },
-  validKeys: {
-    type: [String], // List of keys that make sense for this category
-    required: true,
-  }
-}, { timestamps: true });
+  features: mongoose.Schema.Types.Mixed
+}, { timestamps: true ,collection: 'product' });
 
 module.exports = mongoose.model('ComparisonProduct', comparisonSchema);

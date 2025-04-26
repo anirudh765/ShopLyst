@@ -10,6 +10,7 @@ import ProductDetail from './pages/ProductDetail';
 import EditProduct    from './pages/EditProduct';
 import AddProduct from './pages/AddProduct';
 import Alerts from './pages/Alerts'; 
+import Compare from './pages/Compare';
 
 import AuthProvider from './context/AuthContext';
 import WishlistProvider from './context/WishlistContext';
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/product/edit/:id" element={<EditProduct />} />
               <Route path="/product/add" element={<AddProduct />} />
               <Route path="/alerts" element={<Alerts />} />
+              <Route path="/compare" element={<Compare />} />
             </Routes>
           </WishlistProvider>
         </AuthProvider>

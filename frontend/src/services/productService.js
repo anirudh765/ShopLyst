@@ -1,7 +1,14 @@
 import api from './api';
 
-const searchProducts = async (query) => {
-  const res = await api.get('/products/search', { params: { q: query } });
+// const searchProducts = async (query) => {
+//   const res = await api.get('/products/search', { params: { q: query } });
+//   return res.data;
+// };
+
+const searchProducts = async (q, page = 1, limit = 20, category = '') => {
+  const res = await api.get('/products/search', {
+    params: { q, page, limit, category }
+  });
   return res.data;
 };
 
@@ -39,11 +46,17 @@ export const addProduct = async (productData) => {
   }
 };
 
+export const getSuggestions = async (id) => {
+  const res = await api.get(`/products/${id}/suggestions`);
+  return res.data;
+};
+
 export default {
   searchProducts,
   getProductById,
   compareProductPrices,
   updateProduct,
   deleteProduct,
-  addProduct
+  addProduct,
+  getSuggestions
 };

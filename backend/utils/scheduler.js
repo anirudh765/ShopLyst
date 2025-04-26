@@ -2,9 +2,6 @@ const cron = require('node-cron');
 const mongoose = require('mongoose');
 const Wishlist = require('../models/Wishlist');
 const Product = require('../models/Product');
-const Alert = require('../models/Alert');
-const comparisonService = require('../services/comparisonService');
-const notificationService = require('../services/notificationService');
 
 /**
  * Scheduler for checking price updates
@@ -50,117 +47,40 @@ const scheduler = {
       // Group by product to avoid checking the same product multiple times
       const productMap = new Map();
       watchedItems.forEach(item => {
-        if (!productMap.has(item.productId._id.toString())) {
-          productMap.set(item.productId._id.toString(), {
-            product: item.productId,
-            users: [{ user: item.userId, wishlistId: item._id }]
-          });
-        } else {
-          productMap.get(item.productId._id.toString()).users.push({ 
-            user: item.userId, 
-            wishlistId: item._id 
-          });
+        if (item.productId) {
+          if (!productMap.has(item.productId._id.toString())) {
+            productMap.set(item.productId._id.toString(), {
+              product: item.productId,
+              users: [{ user: item.userId, wishlistId: item._id }]
+            });
+          } else {
+            productMap.get(item.productId._id.toString()).users.push({ 
+              user: item.userId, 
+              wishlistId: item._id 
+            });
+          }
         }
       });
       
-      // Check prices for each unique product
+      // Now, productMap contains the products and associated users
       for (const [productId, data] of productMap.entries()) {
-        try {
-          const { product, users } = data;
-          
-          // Get latest prices from all sources
-          const latestPriceData = await comparisonService.compareProductPrices(product.externalId);
-          
-          // Check if price has changed
-          let priceChanged = false;
-          let lowestOldPrice = product.lowestPrice;
-          let lowestNewPrice = Infinity;
-          let bestSource = '';
-          
-          // Find lowest new price across all sources
-          for (const source in latestPriceData) {
-            if (latestPriceData[source] && latestPriceData[source].price) {
-              if (latestPriceData[source].price < lowestNewPrice) {
-                lowestNewPrice = latestPriceData[source].price;
-                bestSource = source;
-              }
-            }
-          }
-          
-          // If we have a valid new price
-          if (lowestNewPrice < Infinity) {
-            // Check if price decreased
-            if (lowestNewPrice < lowestOldPrice) {
-              priceChanged = true;
-              
-              // Update product with new lowest price
-              await Product.findByIdAndUpdate(productId, {
-                lowestPrice: lowestNewPrice,
-                priceHistory: [...(product.priceHistory || []), {
-                  price: lowestNewPrice,
-                  date: new Date(),
-                  source: bestSource
-                }],
-                lastUpdated: new Date()
-              });
-              
-              // Notify each user watching this product
-              for (const { user, wishlistId } of users) {
-                // Create alert record
-                const alert = new Notification({
-                  userId: user._id,
-                  productId,
-                  wishlistId,
-                  oldPrice: lowestOldPrice,
-                  newPrice: lowestNewPrice,
-                  source: bestSource,
-                  percentageChange: ((lowestOldPrice - lowestNewPrice) / lowestOldPrice) * 100
-                });
-                await alert.save();
-                
-                // Send notifications
-                await notificationService.notifyPriceChange(
-                  user._id,
-                  product,
-                  lowestOldPrice,
-                  lowestNewPrice,
-                  bestSource
-                );
-              }
-              
-              console.log(
-                `Price drop detected for ${product.name}: ${lowestOldPrice} → ${lowestNewPrice}`
-              );
-            } else if (lowestNewPrice > lowestOldPrice) {
-              // Price increased, update but don't notify
-              await Product.findByIdAndUpdate(productId, {
-                lowestPrice: lowestNewPrice,
-                priceHistory: [...(product.priceHistory || []), {
-                  price: lowestNewPrice,
-                  date: new Date(),
-                  source: bestSource
-                }],
-                lastUpdated: new Date()
-              });
-            }
-          }
-        } catch (productError) {
-          console.error(`Error checking price for product ${productId}:`, productError);
-          // Continue with next product
-        }
+        const { product } = data;
+        
+        // No price comparison, no notifications
+        console.log(`Skipping price check and notification for product ${product.name} (${productId})`);
       }
       
-      console.log('Scheduled price check completed');
+      console.log('Scheduled check completed (no comparison, no notifications)');
     } catch (error) {
-      console.error('Error in price checking scheduler:', error);
+      console.error('Error in scheduler:', error);
     }
   },
   
   /**
-   * Force an immediate price check
+   * Force an immediate check
    */
   runImmediateCheck: async () => {
-    console.log('Running immediate price check');
+    console.log('Running immediate check');
     return scheduler.checkPrices();
   }
 };

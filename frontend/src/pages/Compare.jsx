@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import productService from '../services/productService';
-import { FiExternalLink } from 'react-icons/fi' ;
+import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 
 export default function Compare() {
   const location = useLocation();
@@ -46,16 +46,19 @@ export default function Compare() {
   return (
     <div className="min-h-screen pt-20 px-4 bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-6 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          ← Back
-        </button>
         <div
-          className="bg-white dark:bg-zinc-800 p-6 rounded-2xl shadow transition-colors opacity-0 animate-fade-in-up"
+          className="bg-white dark:bg-zinc-800 p-6 rounded-2xl shadow transition-colors opacity-0 animate-fade-in-up relative"
           style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}
         >
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-6 left-6 flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-all duration-200 group"
+            aria-label="Go back"
+          >
+            <FiArrowLeft className="text-lg group-hover:scale-110 transition-transform" />
+            <span className="group-hover:text-lg transition-all font-medium">Back</span>
+          </button>
+          
           <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-900 dark:text-white">
             Compare Products
           </h1>
@@ -64,13 +67,30 @@ export default function Compare() {
               <thead>
                 <tr>
                   <th className="p-4 border-b"></th>
-                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{leftProd.title}</th>
-                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{rightProd.title}
-                    <button
+                  <th className="p-4 border-b text-left">
+                  <button 
+                    onClick={() => navigate(`/product/${leftId}`)}
+                    className="text-lg font-semibold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all group flex items-center hover:scale-105 origin-left"
+                    aria-label={`View ${leftProd.title} details`}
+                  >
+                    {leftProd.title}
+                    <FiExternalLink 
+                      className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" 
+                      size={16} 
+                    />
+                  </button>
+                  </th>
+                  <th className="p-4 border-b text-left">
+                    <button 
                       onClick={() => navigate(`/product/${rightId}`)}
-                      className="text-blue-600 hover:underline font-semibold"
+                      className="text-lg font-semibold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-all group flex items-center hover:scale-105 origin-left"
+                      aria-label={`View ${rightProd.title} details`}
                     >
-                      <FiExternalLink className="inline-block ml-1" size={16} />
+                      {rightProd.title}
+                      <FiExternalLink 
+                        className="ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" 
+                        size={16} 
+                      />
                     </button>
                   </th>
                 </tr>

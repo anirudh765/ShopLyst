@@ -144,11 +144,11 @@ export default function ProductDetail() {
   const flipkart = comparison.find(c => c.source === 'flipkart') || {};
 
   return (
-    <div className="min-h-screen pt-20 px-4 bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black">
-      <main className="max-w-6xl mx-auto py-8 flex flex-col lg:flex-row gap-8">
+    <div className="min-h-screen pt-20 bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black">
+      <main className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
         
         {/* ─── LEFT PANE: 70% ──────────────────────────────── */}
-        <div className="w-full lg:w-[70%] space-y-8">
+        <div className="w-full lg:w-[70%] space-y-8 px-4 py-8">
           
           {/* Product Header + Features */}
           <section
@@ -245,7 +245,7 @@ export default function ProductDetail() {
         </div>
 
         {/* ─── RIGHT PANE: 30% ─────────────────────────────── */}
-        <aside className="w-full lg:w-[30%] space-y-4">
+        <aside className="w-full lg:w-[32%] bg-white dark:bg-zinc-800 shadow-lg h-screen sticky top-20 right-0 flex flex-col p-4">
           <button
             onClick={handleCompare}
             disabled={!selectedId}
@@ -258,15 +258,22 @@ export default function ProductDetail() {
             Compare
           </button>
 
-          <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-            {suggestions.map(prod => (
-              <Suggestion
-                key={prod._id}
-                product={prod}
-                isSelected={selectedId === prod._id}
-                onClick={handleSelect}
-              />
-            ))}
+          <div className="mt-4 flex-1 flex flex-col overflow-hidden">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Similar Products
+            </h3>
+            <div className="flex-1 overflow-y-auto pr-2">
+              <div className="space-y-4">
+                {suggestions.map(prod => (
+                  <Suggestion
+                    key={prod._id}
+                    product={prod}
+                    isSelected={selectedId === prod._id}
+                    onClick={handleSelect}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </aside>
       </main>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import productService from '../services/productService';
 import { useNavigate } from 'react-router-dom';
+import {toast} from 'react-toastify' ;
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +31,6 @@ const AddProduct = () => {
     if (e.target.name === 'platform') {
       setStatusAnnouncement(`Platform changed to ${e.target.value}`);
     }
-
   };
 
   const handleSubmit = async (e) => {
@@ -69,7 +69,7 @@ const AddProduct = () => {
           };
       console.log("Request in add", payload);
       await productService.addProduct(payload);
-
+      toast.success('Product added successfully!');    
       setSuccessMsg('Product added successfully!');
       setStatusAnnouncement('Product added successfully! Redirecting to home page.');
       setFormData({
@@ -81,16 +81,19 @@ const AddProduct = () => {
         rating: '',
         reviews: '',
         url: '',
-        image: ''
+        image: '',
+    category: '',
+    features: {}
       });
+      
       setTimeout(() => navigate('/'), 1000);
     } catch (err) {
       setErrorMsg(err);
+      setStatusAnnouncement(`Error: ${err}`);
     } finally {
       setLoading(false);
     }
   };
-
 
   const getIdFieldLabel = () => {
     return formData.platform === 'Amazon' ? 'Amazon ID ' : 'Flipkart ID';
@@ -245,7 +248,7 @@ const AddProduct = () => {
                     f[e.target.value] = val;
                     setFormData({ ...formData, features: f });
                   }}
-                  className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none"
+                  className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-700 text-gray-800 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                 />
                 <input
                   type="text"
@@ -256,7 +259,7 @@ const AddProduct = () => {
                     f[key] = e.target.value;
                     setFormData({ ...formData, features: f });
                   }}
-                  className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none"
+                  className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-700 text-gray-800 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                 />
                 <button
                   type="button"

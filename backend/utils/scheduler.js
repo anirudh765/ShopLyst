@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const Wishlist = require('../models/Wishlist');
 const Product = require('../models/Product');
 const Alert = require('../models/Alert');
-const comparisonService = require('../services/comparisonService');
-const notificationService = require('../services/notificationService');
 
 /**
  * Scheduler for checking price updates

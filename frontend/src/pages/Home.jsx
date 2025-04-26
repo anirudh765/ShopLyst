@@ -4,7 +4,7 @@ import productService from '../services/productService'
 
 export default function Home() {
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('')           
+  const [category, setCategory] = useState('')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -23,7 +23,6 @@ export default function Home() {
     fetchProducts('', category)
   }, [category])
 
-  // Clear announcements
   useEffect(() => {
     if (!announcement) return
     const t = setTimeout(() => setAnnouncement(''), 1000)
@@ -34,8 +33,7 @@ export default function Home() {
     setLoading(true)
     setError(null)
     try {
-      // ← productService.searchProducts needs to accept (q, page, limit, category)
-      const { results } = await productService.searchProducts(q, 1, 20, cat)
+      const { results } = await productService.searchProducts(q, 1, 60, cat)
       setProducts(results)
 
       if (cat) {
@@ -46,7 +44,6 @@ export default function Home() {
         setAnnouncement(`Loaded ${results.length} products`)
       }
 
-      // focus results
       if (searchResultsRef.current) {
         setTimeout(() => searchResultsRef.current.focus(), 500)
       }
@@ -62,8 +59,17 @@ export default function Home() {
   const handleSearch = (e) => {
     e.preventDefault()
     if (!query.trim()) return
-    setCategory('')            // clear category filter
+    setCategory('')
     fetchProducts(query.trim(), '')
+  }
+
+  const handleCategoryClick = (cat) => {
+    if (category === cat) {
+      setCategory('')
+    } else {
+      setQuery('')
+      setCategory(cat)
+    }
   }
 
   return (
@@ -79,11 +85,18 @@ export default function Home() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search products..."
-            className="w-full max-w-md px-4 py-2 border rounded-lg"
+            className="w-full max-w-md px-4 py-2 border rounded-lg bg-white text-black dark:bg-white dark:text-black"
           />
-          <button className="px-4 py-2 bg-black text-white rounded-lg">
+          <button
+            className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-lg 
+            hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors 
+            hover:scale-105 active:scale-95 focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 
+            transform duration-150 ease-in-out"
+            type="submit"
+            aria-label="Search products"
+          >
             Search
-          </button>
+        </button>
         </form>
       </div>
 
@@ -93,16 +106,13 @@ export default function Home() {
           {CATEGORIES.map(cat => (
             <button
               key={cat}
-              onClick={() => {
-                setQuery('')      // clear search field
-                setCategory(cat)
-              }}
+              onClick={() => handleCategoryClick(cat)}
               className={`
-                px-4 py-2 whitespace-nowrap
-                rounded-full border
+                px-4 py-2 whitespace-nowrap rounded-full border
+                transition-all duration-200 ease-in-out
                 ${category === cat
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'}
+                  ? 'bg-sky-600 hover:bg-sky-700 text-white border-sky-700 shadow-md scale-105'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 dark:bg-white dark:text-gray-800 dark:border-gray-300 dark:hover:bg-gray-100 hover:scale-105 hover:shadow-sm'}
               `}
             >
               {cat.charAt(0).toUpperCase() + cat.slice(1)}

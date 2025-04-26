@@ -11,6 +11,8 @@ import EditProduct    from './pages/EditProduct';
 import AddProduct from './pages/AddProduct';
 import Alerts from './pages/Alerts'; 
 import Compare from './pages/Compare';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import AuthProvider from './context/AuthContext';
 import WishlistProvider from './context/WishlistContext';
@@ -34,6 +36,7 @@ export default function App() {
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/compare" element={<Compare />} />
             </Routes>
+            <ToastContainer position="top-right" autoClose={3000} />
           </WishlistProvider>
         </AuthProvider>
       </ThemeProvider>

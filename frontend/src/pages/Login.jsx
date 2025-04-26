@@ -18,7 +18,7 @@ export default function Login() {
     setError('');
     try {
       const { user, token } = await authService.login(email, password);
-      login({ user, token });
+      login({token });
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Login failed');

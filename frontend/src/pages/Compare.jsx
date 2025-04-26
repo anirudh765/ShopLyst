@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import productService from '../services/productService';
+import { FiExternalLink } from 'react-icons/fi' ;
 
 export default function Compare() {
   const location = useLocation();
@@ -34,46 +35,57 @@ export default function Compare() {
   }, [leftId, rightId]);
 
   if (loading) return <p className="pt-20 text-center">Loading comparison...</p>;
-  if (error)   return <p className="pt-20 text-center text-red-500">{error}</p>;
+  if (error) return <p className="pt-20 text-center text-red-500">{error}</p>;
   if (!leftProd || !rightProd) return <p className="pt-20 text-center">Invalid products to compare.</p>;
 
-  // build feature union
   const keys = Array.from(new Set([
     ...Object.keys(leftProd.features || {}),
     ...Object.keys(rightProd.features || {})
   ]));
 
   return (
-    <div className="min-h-screen pt-20 px-4 bg-gray-100 dark:bg-gray-900">
-      <button
-        onClick={() => navigate(-1)}
-        className="mb-4 px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
-      >
-        ← Back
-      </button>
-      <div className="max-w-6xl mx-auto bg-white dark:bg-zinc-800 p-6 rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">
-          Compare Products
-        </h1>
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr>
-                <th className="p-3 border-b"></th>
-                <th className="p-3 border-b text-left">{leftProd.title}</th>
-                <th className="p-3 border-b text-left">{rightProd.title}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {keys.map(key => (
-                <tr key={key} className="even:bg-gray-50 dark:even:bg-zinc-700">
-                  <td className="p-3 font-medium text-gray-800 dark:text-gray-200">{key}</td>
-                  <td className="p-3 text-gray-700 dark:text-gray-300">{leftProd.features?.[key] ?? '-'}</td>
-                  <td className="p-3 text-gray-700 dark:text-gray-300">{rightProd.features?.[key] ?? '-'}</td>
+    <div className="min-h-screen pt-20 px-4 bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black transition-colors duration-300">
+      <div className="max-w-6xl mx-auto">
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-6 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+        >
+          ← Back
+        </button>
+        <div
+          className="bg-white dark:bg-zinc-800 p-6 rounded-2xl shadow transition-colors opacity-0 animate-fade-in-up"
+          style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}
+        >
+          <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-900 dark:text-white">
+            Compare Products
+          </h1>
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto border-collapse">
+              <thead>
+                <tr>
+                  <th className="p-4 border-b"></th>
+                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{leftProd.title}</th>
+                  <th className="p-4 border-b text-left text-lg font-semibold text-gray-800 dark:text-gray-200">{rightProd.title}
+                    <button
+                      onClick={() => navigate(`/product/${rightId}`)}
+                      className="text-blue-600 hover:underline font-semibold"
+                    >
+                      <FiExternalLink className="inline-block ml-1" size={16} />
+                    </button>
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {keys.map(key => (
+                  <tr key={key} className="even:bg-gray-50 dark:even:bg-zinc-700">
+                    <td className="p-4 font-medium text-gray-800 dark:text-gray-200">{key}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{leftProd.features?.[key] ?? '-'}</td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">{rightProd.features?.[key] ?? '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

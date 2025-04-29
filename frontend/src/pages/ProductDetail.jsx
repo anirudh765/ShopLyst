@@ -165,7 +165,7 @@ export default function ProductDetail() {
                 {product.title}
               </h1>
               <p className="text-gray-700 dark:text-gray-300">
-                {product.source === 'amazon' ? 'Amazon' : 'Flipkart'}
+                {product.asin ? 'Amazon' : 'Flipkart'}
               </p>
               {product.description && (
                 <p className="text-gray-700 dark:text-gray-300">{product.description}</p>

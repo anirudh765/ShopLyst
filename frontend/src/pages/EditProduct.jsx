@@ -147,7 +147,7 @@ export default function EditProduct() {
                       newFeatures[e.target.value] = featVal;    // add under new key
                       setProduct({ ...product, features: newFeatures });
                     }}
-                    className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-700 text-gray-800 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                   />
                   <input
                     type="text"
@@ -158,7 +158,7 @@ export default function EditProduct() {
                       newFeatures[featKey] = e.target.value;
                       setProduct({ ...product, features: newFeatures });
                     }}
-                    className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-700 text-gray-800 dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition"
                   />
                   <button
                     type="button"

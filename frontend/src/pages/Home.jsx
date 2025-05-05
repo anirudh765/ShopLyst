@@ -10,6 +10,7 @@ export default function Home() {
   const [error, setError] = useState(null)
   const [announcement, setAnnouncement] = useState('')
   const searchResultsRef = useRef(null)
+  const [o, setO] = useState(false)
 
   const CATEGORIES = [
     'phones',
@@ -21,7 +22,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts('', category)
-  }, [category])
+  }, [category, o])
 
   useEffect(() => {
     if (!announcement) return
@@ -71,6 +72,12 @@ export default function Home() {
       setCategory(cat)
     }
   }
+
+  const handleDelete = (id) => {
+    setProducts((prev) => prev.filter((p) => p._id !== id))
+    setO(!o)
+  }
+
 
   return (
     <div className="pt-20 px-4 min-h-screen bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black transition-colors duration-300">
@@ -141,7 +148,7 @@ export default function Home() {
                 className="opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'forwards' }}
               >
-                <ProductCard product={p} />
+                <ProductCard product={p} onDelete={handleDelete}/>
               </div>
             ))}
           </div>

@@ -5,7 +5,9 @@ import { AuthContext } from '../context/AuthContext';
 import productService from '../services/productService';
 import { WishlistContext } from '../context/WishlistContext';
 import Suggestion from '../components/Suggestion';
+import { deleteProduct } from '../services/productService';
 import { toast } from 'react-toastify' ;
+import GenericModal from '../components/GenericModal';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -28,6 +30,7 @@ export default function ProductDetail() {
   const [wishError, setWishError] = useState('');
   const [wishSuccess, setWishSuccess] = useState('');
   const [announcement, setAnnouncement] = useState('');
+  const [modalState, setModalState] = useState({ open: false, type: null });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,7 +67,7 @@ export default function ProductDetail() {
     }
   }, [announcement]);
 
-  const handleAddToWishlist = async () => {
+  const handleAddToWishlist = async (targetPrice) => {
     if (!user) {
       setWishError('Please log in to add to wishlist');
       setAnnouncement('Please log in to add to wishlist');
@@ -73,18 +76,6 @@ export default function ProductDetail() {
     setWishLoading(true);
     setWishError('');
     setWishSuccess('');
-
-    let targetPrice = null;
-    if (window.confirm('Would you like to set a target price for this product?')) {
-      const input = window.prompt('Enter your target price:');
-      if (input) {
-        targetPrice = parseFloat(input);
-        if (isNaN(targetPrice)) {
-          setAnnouncement('Invalid target price entered');
-          return alert('Invalid target price entered. Please try again.');
-        }
-      }
-    }
 
     try {
       await addItem({
@@ -140,6 +131,22 @@ export default function ProductDetail() {
     navigate(`/product/edit/${product._id}`, { state: { product } });
   };
 
+  const handleDelete = async (e) => {
+      e.stopPropagation();
+     
+        try {
+          await deleteProduct(product._id);
+          navigate('/');
+          setAnnouncement("Product successfully deleted");
+          toast.success("Product deleted successfully");
+          console.log("Product deleted");
+        } catch (err) {
+          setAnnouncement("Failed to delete product");
+          console.error("Failed to delete product");
+        }
+      
+    };
+
   const amazon = comparison.find(c => c.source === 'amazon'  || c.asin) || {};
   const flipkart = comparison.find(c => c.source === 'flipkart') || {};
 
@@ -165,7 +172,7 @@ export default function ProductDetail() {
                 {product.title}
               </h1>
               <p className="text-gray-700 dark:text-gray-300">
-                {product.asin ? 'Amazon' : 'Flipkart'}
+                {(product.asin || product.source === 'amazon' )? 'Amazon' : 'Flipkart'}
               </p>
               {product.description && (
                 <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
@@ -178,25 +185,51 @@ export default function ProductDetail() {
                 <p className="text-gray-700 dark:text-gray-300">Reviews: {product.reviews}</p>
               </div>
               {user && !user.isadmin && (
-                <button                  
-                  onClick={handleAddToWishlist}
-                  className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg"
-                >
-                  Add to Wishlist
-                </button>
+                 <button
+                 onClick={(e) => { e.stopPropagation(); setModalState({ open: true, type: 'wishlist' }); }}
+                 onKeyDown={(e) => e.stopPropagation()}
+                 className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
+               >
+                 Add to Wishlist
+               </button>
               )}
 
               { user && user.isadmin && 
-                (<button
-                onClick={handleEdit}
+                <>
+                <button
+                  onClick={handleEdit}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
+                  aria-label={`Edit product: ${product.title}`}
+                >
+                  Edit Product
+                </button>
+                <button
+                onClick={(e) => { e.stopPropagation(); setModalState({ open: true, type: 'delete' }); }}
                 onKeyDown={(e) => e.stopPropagation()}
-                className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
-                aria-label={`Edit product: ${product.title}`}
+                className="w-full py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
               >
-                Edit Product
-              </button>)
+                Delete Product
+              </button>
+              </>
               }
             </div>
+            <GenericModal
+                    isOpen={modalState.open}
+                    title={modalState.type === 'delete' ? 'Delete Product' : 'Set Target Price'}
+                    message={modalState.type === 'delete' ? 'Are you sure you want to delete this product?' : 'Enter your desired target price:'}
+                    confirmText={modalState.type === 'delete' ? 'Delete' : 'Add'}
+                    cancelText="Cancel"
+                    requireInput={modalState.type === 'wishlist'}
+                    inputLabel={modalState.type === 'wishlist' ? 'Target Price' : ''}
+                    placeholder={modalState.type === 'wishlist' ? 'e.g. 2999.99' : ''}
+                    onCancel={() => setModalState({ open: false, type: null })}
+                    onConfirm={(inputValue) => {
+                      setModalState({ open: false, type: null });
+                      if (modalState.type === 'delete') handleDelete();
+                      else handleAddToWishlist(inputValue ? parseFloat(inputValue) : null);
+                    }}
+                  />
           </section>
 
           {/* Features */}

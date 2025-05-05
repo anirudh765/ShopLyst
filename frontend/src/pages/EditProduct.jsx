@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import productService from '../services/productService';
+import { toast } from 'react-toastify' ;
 
 export default function EditProduct() {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export default function EditProduct() {
     try {
       await productService.updateProduct(id, product);
       setStatusAnnouncement('Changes saved successfully, redirecting to product page');
+      toast.success('Product updated successfully!');
       navigate(`/product/${id}`);
     } catch (err) {
       setError('Failed to save changes');

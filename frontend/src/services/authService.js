@@ -1,9 +1,8 @@
-// src/services/authService.js
 import api from './api';
 
 export const login = async (email, password) => {
   const res = await api.post('/auth/login', { email, password });
-  return res.data; // { user, token }
+  return res.data; 
 };
 
 export const signup = async (name, email, password, adminKey = null) => {

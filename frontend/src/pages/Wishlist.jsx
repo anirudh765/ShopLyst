@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import WishlistItem from '../components/WishlistItem';
 import wishlistService from '../services/wishlistService';
 import { AuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import GenericModal from '../components/GenericModal';
 
 export default function Wishlist() {
   const { user } = useContext(AuthContext);
@@ -10,6 +12,10 @@ export default function Wishlist() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [announcement, setAnnouncement] = useState('');
+  const [modalState, setModalState] = useState({
+    open: false,
+    itemId: null
+  });
 
   useEffect(() => {
     if (!user) return;
@@ -37,9 +43,11 @@ export default function Wishlist() {
     fetchWishlist();
   }, [user]);
 
-  const handleRemove = async (id) => {
+  const handleRemoveConfirm = async () => {
     try {
-      if (!window.confirm('Are you sure you want to remove this item from your wishlist?')) return;
+      const id = modalState.itemId;
+      if (!id) return;
+      
       await wishlistService.removeFromWishlist(id);
       const removedItem = items.find(item => item._id === id);
       toast.info(`Removed ${removedItem?.title || 'item'} from wishlist`);
@@ -49,6 +57,13 @@ export default function Wishlist() {
       console.error('Remove failed', err);
       setAnnouncement('Failed to remove item from wishlist');
     }
+  };
+
+  const handleRemove = (id) => {
+    setModalState({
+      open: true,
+      itemId: id
+    });
   };
 
   return (
@@ -112,6 +127,20 @@ export default function Wishlist() {
           ))}
         </div>
       )}
+
+      <GenericModal
+        isOpen={modalState.open}
+        title="Remove from Wishlist"
+        message="Are you sure you want to remove this item from your wishlist?"
+        confirmText="Remove"
+        cancelText="Cancel"
+        requireInput={false}
+        onCancel={() => setModalState({ open: false, itemId: null })}
+        onConfirm={() => {
+          handleRemoveConfirm();
+          setModalState({ open: false, itemId: null });
+        }}
+      />
     </div>
   );
 }

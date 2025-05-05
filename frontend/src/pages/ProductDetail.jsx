@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useLocation ,useNavigate} from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import PriceComparisonTable from '../components/PriceComparisonTable';
 import { AuthContext } from '../context/AuthContext';
 import productService from '../services/productService';
 import { WishlistContext } from '../context/WishlistContext';
 import Suggestion from '../components/Suggestion';
 import { deleteProduct } from '../services/productService';
-import { toast } from 'react-toastify' ;
+import { toast } from 'react-toastify';
 import GenericModal from '../components/GenericModal';
 
 export default function ProductDetail() {
@@ -44,10 +44,10 @@ export default function ProductDetail() {
         const comp = await productService.compareProductPrices(prod._id || prod.id);
         setComparison(comp.prices || []);
 
-       // old category-based suggestions      
-       // new dedicated suggestions endpoint
-       const suggs = await productService.getSuggestions(prod._id || prod.id);
-       setSuggestions(suggs);
+        // old category-based suggestions      
+        // new dedicated suggestions endpoint
+        const suggs = await productService.getSuggestions(prod._id || prod.id);
+        setSuggestions(suggs);
 
       } catch (err) {
         setError(err.response?.data?.message || err.message);
@@ -89,7 +89,7 @@ export default function ProductDetail() {
       setAnnouncement('Product successfully added to wishlist');
     } catch (error) {
       console.error('Error adding to wishlist:', error);
-  
+
       if (error.response && error.response.status === 400) {
         toast.info('Product already exists in your wishlist');
       } else {
@@ -131,32 +131,29 @@ export default function ProductDetail() {
     navigate(`/product/edit/${product._id}`, { state: { product } });
   };
 
-  const handleDelete = async (e) => {
-      e.stopPropagation();
-     
-        try {
-          await deleteProduct(product._id);
-          navigate('/');
-          setAnnouncement("Product successfully deleted");
-          toast.success("Product deleted successfully");
-          console.log("Product deleted");
-        } catch (err) {
-          setAnnouncement("Failed to delete product");
-          console.error("Failed to delete product");
-        }
-      
-    };
+  const handleDelete = async () => {
+    try {
+      await deleteProduct(product._id);
+      navigate('/');
+      setAnnouncement("Product successfully deleted");
+      toast.success("Product deleted successfully");
+      console.log("Product deleted");
+    } catch (err) {
+      setAnnouncement("Failed to delete product");
+      console.error("Failed to delete product");
+    }
+  };
 
-  const amazon = comparison.find(c => c.source === 'amazon'  || c.asin) || {};
+  const amazon = comparison.find(c => c.source === 'amazon' || c.asin) || {};
   const flipkart = comparison.find(c => c.source === 'flipkart') || {};
 
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-br from-zinc-100 to-gray-200 dark:from-zinc-900 dark:to-black">
       <main className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
-        
+
         {/* ─── LEFT PANE: 70% ──────────────────────────────── */}
         <div className="w-full lg:w-[70%] space-y-8 px-4 py-8">
-          
+
           {/* Product Header + Features */}
           <section
             className="flex flex-col md:flex-row gap-8 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg"
@@ -172,7 +169,7 @@ export default function ProductDetail() {
                 {product.title}
               </h1>
               <p className="text-gray-700 dark:text-gray-300">
-                {(product.asin || product.source === 'amazon' )? 'Amazon' : 'Flipkart'}
+                {(product.asin || product.source === 'amazon') ? 'Amazon' : 'Flipkart'}
               </p>
               {product.description && (
                 <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
@@ -185,51 +182,54 @@ export default function ProductDetail() {
                 <p className="text-gray-700 dark:text-gray-300">Reviews: {product.reviews}</p>
               </div>
               {user && !user.isadmin && (
-                 <button
-                 onClick={(e) => { e.stopPropagation(); setModalState({ open: true, type: 'wishlist' }); }}
-                 onKeyDown={(e) => e.stopPropagation()}
-                 className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
-               >
-                 Add to Wishlist
-               </button>
-              )}
-
-              { user && user.isadmin && 
-                <>
                 <button
-                  onClick={handleEdit}
+                  onClick={(e) => { e.stopPropagation(); setModalState({ open: true, type: 'wishlist' }); }}
                   onKeyDown={(e) => e.stopPropagation()}
                   className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
-                  aria-label={`Edit product: ${product.title}`}
                 >
-                  Edit Product
+                  Add to Wishlist
                 </button>
-                <button
-                onClick={(e) => { e.stopPropagation(); setModalState({ open: true, type: 'delete' }); }}
-                onKeyDown={(e) => e.stopPropagation()}
-                className="w-full py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
-              >
-                Delete Product
-              </button>
-              </>
+              )}
+
+              {user && user.isadmin &&
+                <>
+                  <button
+                    onClick={handleEdit}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="w-full py-2 mt-2 text-white rounded-lg transition-colors bg-sky-600 dark:bg-sky-700 hover:bg-sky-700 dark:hover:bg-sky-800"
+                    aria-label={`Edit product: ${product.title}`}
+                  >
+                    Edit Product
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setModalState({ open: true, type: 'delete' });
+                    }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    className="w-full py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
+                  >
+                    Delete Product
+                  </button>
+                </>
               }
             </div>
             <GenericModal
-                    isOpen={modalState.open}
-                    title={modalState.type === 'delete' ? 'Delete Product' : 'Set Target Price'}
-                    message={modalState.type === 'delete' ? 'Are you sure you want to delete this product?' : 'Enter your desired target price:'}
-                    confirmText={modalState.type === 'delete' ? 'Delete' : 'Add'}
-                    cancelText="Cancel"
-                    requireInput={modalState.type === 'wishlist'}
-                    inputLabel={modalState.type === 'wishlist' ? 'Target Price' : ''}
-                    placeholder={modalState.type === 'wishlist' ? 'e.g. 2999.99' : ''}
-                    onCancel={() => setModalState({ open: false, type: null })}
-                    onConfirm={(inputValue) => {
-                      setModalState({ open: false, type: null });
-                      if (modalState.type === 'delete') handleDelete();
-                      else handleAddToWishlist(inputValue ? parseFloat(inputValue) : null);
-                    }}
-                  />
+              isOpen={modalState.open}
+              title={modalState.type === 'delete' ? 'Delete Product' : 'Set Target Price'}
+              message={modalState.type === 'delete' ? 'Are you sure you want to delete this product?' : 'Enter your desired target price:'}
+              confirmText={modalState.type === 'delete' ? 'Delete' : 'Add'}
+              cancelText="Cancel"
+              requireInput={modalState.type === 'wishlist'}
+              inputLabel={modalState.type === 'wishlist' ? 'Target Price' : ''}
+              placeholder={modalState.type === 'wishlist' ? 'e.g. 2999.99' : ''}
+              onCancel={() => setModalState({ open: false, type: null })}
+              onConfirm={(inputValue) => {
+                setModalState({ open: false, type: null });
+                if (modalState.type === 'delete') handleDelete();
+                else handleAddToWishlist(inputValue ? parseFloat(inputValue) : null);
+              }}
+            />
           </section>
 
           {/* Features */}
@@ -268,10 +268,10 @@ export default function ProductDetail() {
             </h2>
             <PriceComparisonTable
               product={{
-                amazonPrice:  amazon.price,
+                amazonPrice: amazon.price,
                 flipkartPrice: flipkart.price,
-                amazonUrl:     amazon.url,
-                flipkartUrl:   flipkart.url
+                amazonUrl: amazon.url,
+                flipkartUrl: flipkart.url
               }}
             />
           </section>
@@ -282,11 +282,10 @@ export default function ProductDetail() {
           <button
             onClick={handleCompare}
             disabled={!selectedId}
-            className={`w-full py-2 rounded-lg text-white transition ${
-              selectedId
+            className={`w-full py-2 rounded-lg text-white transition ${selectedId
                 ? 'bg-blue-600 hover:bg-blue-700'
                 : 'bg-gray-400 cursor-not-allowed'
-            }`}
+              }`}
           >
             Compare
           </button>
@@ -312,5 +311,5 @@ export default function ProductDetail() {
       </main>
     </div>
   );
-  
+
 }

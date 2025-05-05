@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const scheduler = require('./utils/scheduler');
 const errorHandler = require('./middleware/errorHandler');
 const cookieParser = require('cookie-parser');
 
@@ -28,8 +27,6 @@ const io = new Server(server, {
   }
 });
 
-// Initialize socket connection
-//require('./utils/socket')(io);
 
 // Middleware
 app.use(cors({

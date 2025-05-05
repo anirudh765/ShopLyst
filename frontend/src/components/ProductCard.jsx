@@ -29,6 +29,10 @@ export default function ProductCard({ product, onDelete }) {
 
   const handleAddToWishlist = async (targetPrice) => {
     try {
+      if(targetPrice <= 0){
+        toast.error('Error adding to wishlist. Give valid target-price');
+        return ;
+      }
       await addItem({
         _id: product._id,
         source: isAmazon ? 'amazon' : 'flipkart',

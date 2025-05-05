@@ -78,6 +78,10 @@ export default function ProductDetail() {
     setWishSuccess('');
 
     try {
+      if(targetPrice <= 0){
+              toast.error('Error adding to wishlist. Give valid target-price');
+              return ;
+            }
       await addItem({
         _id: product._id || product.id,
         source: product.source,

@@ -41,14 +41,21 @@ A website to manage, compare and look for the smartest deals on your wished prod
     cd ../backend
     npm install
 ```
+
 3. Configure environment
+4. 
 Copy .env.example to .env in both frontend and backend directories and set:
+
 MongoDB URI
+
 JWT secret
-Refresh toker secret
+
+Refresh token secret
+
 Admin Key
 
-4. Run the development servers
+
+5. Run the development servers
    ```bash
    # In two terminals
     cd frontend && npm start
